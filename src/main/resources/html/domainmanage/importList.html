@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script th:src="@{/domainmanage/js/jquery.js}"></script>
+    <link rel="stylesheet" th:href="@{/domainmanage/css/bootstrap.css}" >
+    <script th:src="@{/domainmanage/js/bootstrap.js}"></script>
+    <script th:src="@{/domainmanage/js/domain.js}"></script>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row-fluid" style="margin-top: 50px">
+
+        <!--/span-->
+        <div id="download-layout">
+            <div class="container-fluid">
+                <div class="row-fluid">
+                    <div class="span12">
+                        <fieldset style="color: red">
+                            添加field和annotation的时候会引入import支持,
+                            系统可以自动识别通过domain目录加载进来的所有class类型，以及包含的import<br/>
+                            其它需要额外引入的import，可以在这里手动添加,默认写入文件${user.dir}/import.properties
+                        </fieldset>
+                        <form method="post" th:action="@{/domainManage/system/doAddImport}">
+                            <input class="search-query" type="text" name="name" placeholder="name"/> =
+                            <input class="search-query" type="text" name="value" placeholder="value"/>
+                            <button type="button" onclick="doAjaxFormSubmit($(this).closest('form'),true)" class="btn">添加</button>
+                        </form>
+                        <form>
+                            <input placeholder="输入关键字" class="search-query" name="query" th:value="${param.query}" type="text">
+                            <button type="submit" class="btn">查询</button>
+                            <table class="table" contenteditable="true">
+                                <thead>
+                                <tr>
+                                    <th>name</th>
+                                    <th>value</th>
+                                    <th>操作</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="properties:${importList}">
+                                    <td th:text="${properties.name}"></td>
+                                    <td th:text="${properties.value}"></td>
+                                    <td><a th:onclick="doAjaxSubmit([[@{/domainManage/system/doDeleteImport}]],{name:[[${properties.name}]]},true)"  href="javascript:void(0);">删除</a></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--/row-->
+</div>
+</body>
+</html>

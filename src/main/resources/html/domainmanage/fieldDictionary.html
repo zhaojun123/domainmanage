@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script th:src="@{/domainmanage/js/jquery.js}"></script>
+    <link rel="stylesheet" th:href="@{/domainmanage/css/bootstrap.css}" >
+    <script th:src="@{/domainmanage/js/bootstrap.js}"></script>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row-fluid" style="margin-top: 50px">
+
+        <!--/span-->
+        <div id="download-layout">
+            <div class="container-fluid">
+                <div class="row-fluid">
+                    <div class="span12">
+                        <table style="border: none">
+                            <tr>
+                                <td>| fieldName</td>
+                                <td>| fieldType</td>
+                                <td>| example</td>
+                                <td>| note </td>
+                                <td>|</td>
+                            </tr>
+                            <tr>
+                                <td colspan="5">|---|---|---|---|</td>
+                            </tr>
+                            <tr th:each="field:${fieldList}">
+                                <td th:text="${'| '+field.fieldName}"></td>
+                                <td th:text="${'| '+field.fieldType}"></td>
+                                <td th:text="${'| '+field.example}"></td>
+                                <td th:text="${'| '+field.note}"></td>
+                                <td>|</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!--/row-->
+</div>
+</body>
+</html>

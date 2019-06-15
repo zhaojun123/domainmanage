@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script th:src="@{/domainmanage/js/jquery.js}"></script>
+    <link rel="stylesheet" th:href="@{/domainmanage/css/bootstrap.css}" >
+    <script th:src="@{/domainmanage/js/bootstrap.js}"></script>
+    <script th:src="@{/domainmanage/js/domain.js}"></script>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row-fluid" style="margin-top: 50px">
+
+        <!--/span-->
+        <div id="download-layout">
+            <div class="container-fluid">
+                <div class="row-fluid">
+                    <div class="span7">
+                        <form>
+                            <input type="hidden" name="fileKey" th:value="${domain.fileKey}"/>
+                            <table class="table" contenteditable="true">
+                                <thead>
+                                <tr>
+                                    <th>field</th>
+                                    <th>验证</th>
+                                    <th>排序</th>
+                                    <th>操作</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="field:${domain.fieldList}">
+                                    <input type="hidden" name="fieldName" th:value="${field.fieldName}">
+                                    <td>
+                                        <div th:text="${field.fieldName+' ('+field.fieldType+')'}"></div>
+                                        <div style="margin-top: 5px" th:text="${field.note}"></div>
+                                    </td>
+                                    <td style="width: 290px">
+                                            <input type="checkbox" th:checked="${#maps.containsKey(field.validationMap, 'NOT_BLANK')}" name="validations" value="NOT_BLANK"/>@NotBlank
+
+
+                                            <input type="checkbox" th:checked="${#maps.containsKey(field.validationMap, 'NOT_EMPTY')}" name="validations" style="margin-left: 10px" value="NOT_EMPTY"/>@NotEmpty
+
+
+                                            <input type="checkbox" th:checked="${#maps.containsKey(field.validationMap, 'NOT_NULL')}" name="validations" style="margin-left: 10px" value="NOT_NULL"/>@NotNull
+
+                                        <div style="margin-top: 10px">
+                                            <input type="text" style="width: 250px" name="validationMessage" th:value="${#strings.isEmpty(field.validationMessage)?(#strings.isEmpty(field.note)?field.fieldName:field.note)+'不能为空':field.validationMessage}">
+                                        </div>
+                                    </td>
+                                    <td style="width: 70px">
+                                        <select style="width: 60px" onchange="changeSortNo(this)">
+                                            <option th:selected="${field.sortNo==i}" th:text="${i}" th:value="${i}" th:each="i:${#numbers.sequence(0,domain.fieldList.size()-1)}"></option>
+                                        </select>
+                                    </td>
+                                    <td style="width: 70px;">
+                                        <button type="button" onclick="deleteField(this)" class="btn" style="margin-top: 5px">删除</button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <fieldset>
+                                <button type="button" onclick="updateAnnotation(this)" class="btn">修改</button>
+                            </fieldset>
+                        </form>
+                    </div>
+                    <div class="span1"></div>
+                    <div class="span4">
+                        <div class="tab-content">
+                                <form th:action="@{/domainManage/domain/doAddField}" method="post" id="doAddFieldForm">
+                                    <input type="hidden" name="fileKeys" th:value="${domain.fileKey}">
+                                    <fieldset>
+                                        <label><span style="color: red">*</span>field名称</label>
+                                        <input type="text" name="fieldName" placeholder="testFieldName"/>
+                                        <label><span style="color: red">*</span>field类型</label>
+                                        <input type="text" name="fieldType" placeholder="Test"/>
+                                        <label><span style="color: red">*</span>注释</label>
+                                        <input type="text" name="note" placeholder="测试field"/>
+                                        <label>Get/Set</label>
+                                        <select name="status">
+                                            <option value="ALL">GET/SET</option>
+                                            <option value="GET">GET</option>
+                                            <option value="SET">SET</option>
+                                            <option value="NONE">NONE</option>
+                                        </select>
+                                        <label>添加验证</label>
+
+                                        <input type="checkbox" name="validations" value="NOT_BLANK"/>@NotBlank
+                                        <input type="checkbox" name="validations" style="margin-left: 50px" value="NOT_EMPTY"/>@NotEmpty
+                                        <input type="checkbox" name="validations" style="margin-left: 50px" value="NOT_NULL"/>@NotNull
+                                        <div style="margin-top: 10px">
+                                            <input type="text" name="validationMessage" placeholder="验证失败提示例如 XXX不能为空">
+                                        </div>
+                                        <div style="color: red">
+                                            <div>添加javax.validation验证注解</div>
+                                            <div>判断String不可为纯空格，使用@NotBlank</div>
+                                            <div>判断String、Collection、Map、数组等不为空，使用@NotEmpty</div>
+                                            <div>判断所有类型不为null，使用@NotNull</div>
+                                        </div>
+                                        <br/>
+                                        <div>
+                                            能自动识别 list、map、set、BigDecimal、Date、基本类型及包装类、通过domain文件目录加载进来的所有class类型
+                                            除以上之外的field类型需要手动在templates/domainmanage/import.properties添加
+                                        </div>
+                                        <br/>
+                                        <div>
+                                            注意：如果类里面已有同样的field名称则会忽略添加
+                                        </div>
+                                        <label></label>
+                                        <button type="button" onclick="doAjaxFormSubmit($('#doAddFieldForm'),true)" class="btn">添加</button>
+                                    </fieldset>
+                                </form>
+                        </div>
+
+                    </div>
+                </div>
+            </div></div>
+    </div>
+    <!--/row-->
+</div>
+
+<script>
+    function changeSortNo(obj){
+        var select = $(obj)
+        var sortNo = select.val();
+        var fieldName = select.closest("tr").find("input[name='fieldName']").val()
+        var fileKey = select.closest("form").find("input[name='fileKey']").val()
+        doAjaxSubmit("[[@{'/domainManage/domain/doSwitchField'}]]",{fileKey:fileKey,fieldName:fieldName,sortNo:sortNo},true)
+    }
+
+    function deleteField(obj){
+        var select = $(obj)
+        var fieldName = select.closest("tr").find("input[name='fieldName']").val()
+        var fileKey = select.closest("form").find("input[name='fileKey']").val()
+        doAjaxSubmit("[[@{'/domainManage/domain/doDeleteField'}]]",{fileKeys:fileKey,fieldName:fieldName},true)
+    }
+
+    function updateAnnotation(obj){
+        var fieldArrays = new Array();
+        var o = $(obj)
+        var form = o.closest("form")
+        var fileKey = form.find("input[name='fileKey']").val()
+        var trList = form.find("tbody").find("tr")
+        trList.each(function(){
+            var fieldObject = {};
+            fieldObject.fieldName = $(this).find("input[name='fieldName']").val()
+            var checkValidationList = new Array()
+            $(this).find("input[name='validations']:checked").each(function(){
+                checkValidationList.push($(this).val())
+            })
+            fieldObject.validationList = checkValidationList;
+            fieldObject.validationMessage = $(this).find("input[name='validationMessage']").val()
+            fieldArrays.push(fieldObject)
+
+        });
+        $.ajax({
+            url:"[[@{'/domainManage/domain/doUpdateFieldValidation'}]]?fileKey="+fileKey,
+            data:JSON.stringify(fieldArrays),
+            method:"POST",
+            contentType: "application/json;charset=utf-8",
+            success:function(result){
+                alert(result.message)
+                if(result.result == "SUCCESS"){
+                    location.href=location.href
+                }
+            },
+            error:function(jqXHR){
+                alert("请求出错");
+            }
+        });
+    }
+</script>
+
+</body>
+</html>

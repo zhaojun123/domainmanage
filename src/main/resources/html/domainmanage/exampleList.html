@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script th:src="@{/domainmanage/js/jquery.js}"></script>
+    <link rel="stylesheet" th:href="@{/domainmanage/css/bootstrap.css}" >
+    <script th:src="@{/domainmanage/js/bootstrap.js}"></script>
+    <script th:src="@{/domainmanage/js/domain.js}"></script>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row-fluid" style="margin-top: 50px">
+
+        <!--/span-->
+        <div id="download-layout">
+            <div class="container-fluid">
+                <div class="row-fluid">
+                    <div class="span12">
+                        <fieldset style="margin-bottom: 10px;color: red">
+                                添加Swagger注解、导出field字典需要field相对应的example值,可以在这里手动设置,
+                                默认写入文件${user.dir}/example.properties，也可以直接修改example.properties，实时生效
+                        </fieldset>
+                        <form method="post" th:action="@{/domainManage/system/doImportExample}" enctype="multipart/form-data" style="display:inline-block; width: 500px">
+                            导入properties文件：<input onchange="$(this).closest('form').submit()" class="search-query" readonly="readonly" type="file" name="file">
+                        </form>
+                        <span method="post" style="display:inline-block; width: 600px" th:action="@{/domainManage/system/doLoadExampleNames}">
+                            <button th:onclick="doAjaxSubmit([[@{/domainManage/system/doLoadExampleNames}]],{},true)" type="button" class="btn">快速生成example</button>根据导入的domain批量生成相应的name
+                        </span>
+                        <form method="post" th:action="@{/domainManage/system/doAddExample}">
+                            <input class="search-query" type="text" name="name" placeholder="name"/>
+                            <input class="search-query" type="text" name="value" placeholder="value"/>
+                            <input class="search-query" type="text" name="comment" placeholder="注释"/>
+                            <button type="button" onclick="doAjaxFormSubmit($(this).closest('form'),true)" class="btn">添加</button>
+                        </form>
+                        <form>
+                            <input placeholder="输入关键字" class="search-query" name="query" th:value="${param.query}" type="text">
+                            <button type="submit" class="btn">查询</button>
+                        </form>
+                            <table class="table" contenteditable="true">
+                                <thead>
+                                <tr>
+                                    <th>name</th>
+                                    <th>value</th>
+                                    <th>注释</th>
+                                    <th style="width: 50px;">操作</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="properties:${exampleList}">
+                                    <td th:text="${properties.name}"></td>
+                                    <td><input  th:onblur="doAjaxSubmit([[@{/domainManage/system/doAddExample}]],{name:[[${properties.name}]],value:this.value,comment:[[${properties.comment}]]},false)" type="text" name="value" class="input-xxlarge" th:value="${properties.value}"></td>
+                                    <td th:text="${properties.comment}"></td>
+                                    <td><a th:onclick="doAjaxSubmit([[@{/domainManage/system/doDeleteExample}]],{name:[[${properties.name}]]},true)"  href="javascript:void(0);">删除</a></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--/row-->
+</div>
+</body>
+</html>

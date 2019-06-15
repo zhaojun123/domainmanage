@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" th:src="@{/domainmanage/syntaxhighlighter/src/shCore.js}"></script>
+    <script type="text/javascript" th:src="@{/domainmanage/syntaxhighlighter/scripts/shBrushJava.js}"></script>
+    <link type="text/css" rel="stylesheet" th:href="@{/domainmanage/syntaxhighlighter/styles/shCoreDefault.css}"/>
+    <script type="text/javascript">SyntaxHighlighter.all();</script>
+</head>
+<body style="background: white; font-family: Helvetica">
+<script type="syntaxhighlighter" th:class="${'brush: java;highlight:'+highlight}" class="brush: java;" th:text="${code}">
+</script>
+
+</body>
+</html>

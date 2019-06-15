@@ -1,0 +1,7 @@
+    /**
+     * #{note}
+     * @return
+     */
+    public #{fieldType} #{getMethodName}() {
+        return #{fieldName};
+    }

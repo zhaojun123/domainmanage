@@ -1,0 +1,4 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.zkml.domainmanage.support.DomainManageAutoConfig,\
+com.zkml.domainmanage.support.ValidationAnnotationAutoConfig,\
+com.zkml.domainmanage.support.SwaggerAnnotationAutoConfig

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script th:src="@{/domainmanage/js/jquery.js}"></script>
+    <link rel="stylesheet" th:href="@{/domainmanage/css/bootstrap.css}" >
+    <script th:src="@{/domainmanage/js/bootstrap.js}"></script>
+    <link rel="stylesheet" th:href="@{/domainmanage/fancybox/jquery.fancybox.min.css}" />
+    <script th:src="@{/domainmanage/fancybox/jquery.fancybox.min.js}"></script>
+    <script th:src="@{/domainmanage/js/domain.js}"></script>
+
+    <style>
+        .highlighter{
+            background-color: yellow;
+        }
+        .add{
+            font-size:xx-large;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row-fluid" style="margin-top: 50px">
+
+        <!--/span-->
+        <div id="download-layout">
+            <div class="container-fluid">
+                <div class="row-fluid">
+                    <div class="span12">
+                        <form class="form-search" method="get">
+                            <span class="localPathLoad">
+                                <span th:if="${#arrays.isEmpty(localPathList)}">
+                                    <input placeholder="输入domain文件目录" class="search-query" name="localPath"  style="width: 70%" type="text"><span onclick="addlocalPath(this)" class="add">+</span>
+                                </span>
+                                <span th:each="localPath,iterStat:${localPathList}">
+                                    <input placeholder="输入domain文件目录" class="search-query" name="localPath" th:value="${localPath}"  style="width: 70%" type="text">
+                                    <span th:if="${iterStat.index == 0}" onclick="addlocalPath(this)" class="add">+</span>
+                                    <span th:if="${iterStat.index != 0}" onclick="removelocalPath(this)" class="add">-</span>
+                                </span>
+                            </span>
+                            <button type="submit" class="btn" style="margin-left: 50px">载入</button>
+                        </form>
+                    </div>
+                </div>
+            <div class="row-fluid">
+                <div class="span7">
+                    <form class="form-search" method="get">
+                        <input placeholder="输入关键字" class="input-xxlarge search-query" name="query" th:value="${param.query}" type="text">
+                        <button type="submit" class="btn">查询</button>
+                    </form>
+                    <ul style="list-style: none;">
+                        <li th:each="domain:${domainList}">
+                            <table  th:style="${'width: 100%;margin-top: 5px;margin-left:'+domain.level*3+'0px'}">
+                                <tr>
+                                    <td style="width: 10px"><input type="checkbox"  onclick="handleCheckBox(this)" th:attr="parentFileKey=${domain.parentFileKey}" th:value="${domain.fileKey}" name="fileKey"></td>
+                                    <td th:if="${!domain.directory}">
+                                        <a data-fancybox data-type="iframe" th:attr="data-src=@{'/domainManage/domain/domainDetail'(fileKey=${domain.fileKey})}" href="javascript:;" >
+                                            <span th:text="${domain.className}"></span>
+                                        </a>
+                                    </td>
+                                    <td th:if="${domain.directory}" th:text="${domain.className}"></td>
+                                    <td th:text="${domain.note}" style="color: grey">
+                                    </td>
+                                    <td style="width: 100px">
+                                        <a th:if="${!domain.directory}" data-fancybox data-type="iframe" th:attr="data-src=@{'/domainManage/domain/code'(fileKey=${domain.fileKey})}" href="javascript:;" >
+                                            查看代码
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr th:each="query:${domain.queryContentList}">
+                                    <td colspan="4">
+                                        <a style="color: grey" data-fancybox data-type="iframe" th:attr="data-src=@{'/domainManage/domain/code'(fileKey=${domain.fileKey},query=${query.highlighter})}" href="javascript:;" >
+                                            <span th:text="${query.line}"></span>
+                                            <span class="query" th:attr="highlighter=${query.highlighter}" th:text="${query.content}"></span>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </li>
+                    </ul>
+                    <fieldset>
+                        <form th:action="@{/domainManage/domain/doBatchAddSwagger}" method="post" style="display:inline-block; width: 180px">
+                            <input type="hidden" name="fileKeys" value="">
+                            <button type="button" onclick="doDomainBatch(this)" class="btn">批量生成Swagger注解</button>
+                        </form>
+                        <form th:action="@{/domainManage/domain/doBatchDeleteSwagger}" method="post" style="display:inline-block; width: 180px">
+                            <input type="hidden" name="fileKeys" value="">
+                            <button type="button" onclick="doDomainBatch(this)" class="btn">批量清除Swagger注解</button>
+                        </form>
+                        <a data-fancybox data-type="iframe" class="btn" th:attr="data-src=@{'/domainManage/domain/fieldDictionary'}" href="javascript:;" >
+                            field字典
+                        </a>
+                        <div style="color: red">
+                            注意：批量生成Swagger注解 已有的ApiModel、ApiModelProperty标签不会被覆盖，如果需要重新生成，请先操作清理Swagger注解
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="span1">
+                </div>
+                <div class="span4">
+                    <div class="tabbable" id="tabs-928187">
+                        <ul class="nav nav-tabs">
+                            <li class="active">
+                                <a href="#panel1" data-toggle="tab">批量增加</a>
+                            </li>
+                            <li>
+                                <a href="#panel2" data-toggle="tab">批量删除</a>
+                            </li>
+                            <li>
+                                <a href="#panel3" data-toggle="tab">批量增加（自定义）</a>
+                            </li>
+                            <li>
+                                <a href="javascript:;"  th:attr="data-src=@{'/domainManage/system/importList'}" data-fancybox data-type="iframe" >设置import</a>
+                            </li>
+                            <li>
+                                <a href="javascript:;"  th:attr="data-src=@{'/domainManage/system/exampleList'}" data-fancybox data-type="iframe" >设置example</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="panel1">
+                            <form th:action="@{/domainManage/domain/doAddField}" method="post" id="doAddFieldForm">
+                                <input type="hidden" name="fileKeys" value="">
+                                <fieldset>
+                                    <label><span style="color: red">*</span>field名称</label>
+                                    <input type="text" name="fieldName" placeholder="testFieldName"/>
+                                    <label><span style="color: red">*</span>field类型</label>
+                                    <input type="text" name="fieldType" placeholder="Test"/>
+                                    <label><span style="color: red">*</span>注释</label>
+                                    <input type="text" name="note" placeholder="测试field"/>
+                                    <label>Get/Set</label>
+                                    <select name="status">
+                                        <option value="ALL">GET/SET</option>
+                                        <option value="GET">GET</option>
+                                        <option value="SET">SET</option>
+                                        <option value="NONE">NONE</option>
+                                    </select>
+                                    <label>添加验证</label>
+
+                                    <input type="checkbox" name="validations" value="NOT_BLANK"/>@NotBlank
+                                    <input type="checkbox" name="validations" style="margin-left: 50px" value="NOT_EMPTY"/>@NotEmpty
+                                    <input type="checkbox" name="validations" style="margin-left: 50px" value="NOT_NULL"/>@NotNull
+                                    <div style="margin-top: 10px">
+                                        <input type="text" name="validationMessage" placeholder="验证错误提示例如 XXX不能为空">
+                                    </div>
+                                    <div style="color: red">
+                                        <div>添加javax.validation验证注解</div>
+                                        <div>判断String不可为纯空格，使用@NotBlank</div>
+                                        <div>判断String、Collection、Map、数组等不为空，使用@NotEmpty</div>
+                                        <div>判断所有类型不为null，使用@NotNull</div>
+                                    </div>
+                                    <br/>
+
+                                    <div>
+                                        注意：如果类里面已有同样的field名称则会忽略添加
+                                    </div>
+                                    <label></label>
+                                    <button type="button" onclick="doDomainBatch(this)" class="btn">添加</button>
+                                </fieldset>
+                            </form>
+                        </div>
+                        <div class="tab-pane" id="panel2">
+                            <form th:action="@{/domainManage/domain/doDeleteField}" method="post" id="doDeleteFieldForm">
+                                <input type="hidden" name="fileKeys" value="">
+                                <label><span style="color: red">*</span>field名</label>
+                                <input type="text" name="fieldName" placeholder="testFieldName"/>
+                                <div>
+                                    删除field的同时也会删除 get/set方法
+                                </div>
+                                <label></label>
+                                <button type="button" onclick="doDomainBatch(this)" class="btn">删除</button>
+                            </form>
+                        </div>
+                        <div class="tab-pane" id="panel3">
+                            <form th:action="@{/domainManage/domain/doAddFieldCustomize}" method="post" id="doAddFieldCustomizeForm">
+                                <input type="hidden" name="fileKeys" value="">
+                                <label><span style="color: red">*</span>自定义field/get/set代码</label>
+                                <textarea name="fieldContent" style="width: 400px;height:350px"></textarea>
+                                <div>
+                                    自定义添加field/get/set代码，
+                                    有些特殊情况需要自己写一些复杂的代码，例如加一些自定义注解，在get/set里面写一些逻辑等
+                                </div>
+                                <div>
+                                    注意：除filed、get、set类型以外的代码在处理过程中会被忽略掉,如果类里面已有同样的field名称则会忽略添加
+                                </div>
+                                <label></label>
+                                <button type="button" onclick="doDomainBatch(this)" class="btn">添加</button>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div></div>
+    </div>
+    <!--/row-->
+</div>
+<script>
+
+    function addlocalPath(obj){
+        $(".localPathLoad").append('<input placeholder="输入domain文件目录" class="search-query" name="localPath" style="width: 70%" type="text"> <span class="add" onclick="removelocalPath(this)">-</span>')
+    }
+
+    function removelocalPath(obj){
+        $(obj).prev().remove();
+        $(obj).remove()
+    }
+
+    function handleCheckBox(obj){
+        var fileKey = $(obj).val();
+        var fileKeyList = new Array();
+        fileKeyList.push(fileKey)
+        for(var i=0;i<fileKeyList.length;i++){
+            var checkList = $("input[type='checkbox'][parentFileKey='"+fileKeyList[i]+"']")
+            checkList.each(function(){
+                fileKeyList.push($(this).val())
+            })
+        }
+        var checked = obj.checked
+        for(var i=0;i<fileKeyList.length;i++){
+            $("input[type='checkbox'][value='"+fileKeyList[i]+"']").prop("checked", checked);
+        }
+    }
+
+    $(".query").each(function(){
+        var highlighter = $(this).attr("highlighter").toLowerCase();
+        var content = $(this).html()
+        var contentLow = content.toLowerCase();
+        var index = contentLow.indexOf(highlighter)
+        content = content.substring(0,index)+'<span class="highlighter">'
+            + content.substring(index,index+highlighter.length)
+            + '</span>'+content.substring(index+highlighter.length,content.length)
+        $(this).html(content)
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+    /**
+     * #{note}
+     * @param #{fieldName}
+     */
+    public void #{setMethodName}(#{fieldType} #{fieldName}) {
+        this.#{fieldName} = #{fieldName};
+    }
