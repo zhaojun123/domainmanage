@@ -21,8 +21,9 @@
                                 添加Swagger注解、导出field字典需要field相对应的example值,可以在这里手动设置,
                                 默认写入文件${user.dir}/example.properties，也可以直接修改example.properties，实时生效
                         </fieldset>
-                        <form method="post" th:action="@{/domainManage/system/doImportExample}" enctype="multipart/form-data" style="display:inline-block; width: 500px">
+                        <form method="post" th:action="@{/domainManage/system/doImportExample}" enctype="multipart/form-data" style="display:inline-block; width: 600px">
                             导入properties文件：<input onchange="$(this).closest('form').submit()" class="search-query" readonly="readonly" type="file" name="file">
+                            忽略已有的name
                         </form>
                         <span method="post" style="display:inline-block; width: 600px" th:action="@{/domainManage/system/doLoadExampleNames}">
                             <button th:onclick="doAjaxSubmit([[@{/domainManage/system/doLoadExampleNames}]],{},true)" type="button" class="btn">快速生成example</button>根据导入的domain批量生成相应的name
