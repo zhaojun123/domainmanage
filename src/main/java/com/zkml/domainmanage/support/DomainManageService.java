@@ -78,12 +78,14 @@ public class DomainManageService {
             if(!domainMetadata.isDirectory()){
                 List<FieldMetadata> fieldList = domainMetadata.getFieldMetadataList();
                 for(FieldMetadata field : fieldList){
-                    FieldDictionaryVO vo = new FieldDictionaryVO();
-                    vo.setFieldName(field.getFieldName());
-                    vo.setFieldType(field.getFieldType());
-                    vo.setNote(field.getProcessedNote());
-                    vo.setExample(fieldExampleResolver.getExample(field.getFieldName()));
-                    result.add(vo);
+                    if(DomainUtils.isFieldDictionaryType(field.getFieldType())){
+                        FieldDictionaryVO vo = new FieldDictionaryVO();
+                        vo.setFieldName(field.getFieldName());
+                        vo.setFieldType(field.getFieldType());
+                        vo.setNote(field.getProcessedNote());
+                        vo.setExample(fieldExampleResolver.getExample(field.getFieldName()));
+                        result.add(vo);
+                    }
                 }
             }
         }

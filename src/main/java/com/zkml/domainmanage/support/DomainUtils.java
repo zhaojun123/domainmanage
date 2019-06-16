@@ -15,14 +15,27 @@ import java.util.stream.Collectors;
  */
 public class DomainUtils {
 
+    /**
+     * 基础类型
+     */
     public static String[] baseType = {"int","long","double","float","char","byte","short","boolean"
             ,"Integer","Long","Double","Float","Character","Byte","Short","Boolean","String"};
+
+    /**
+     * 可以被导出field字典的类型
+     */
+    public static String[] fieldDictionaryType ={"int","long","double","float","char","byte","short","boolean"
+            ,"Integer","Long","Double","Float","Character","Byte","Short","Boolean","String","Date","BigDecimal"};
 
     //查询field的正则表达式
     private static Pattern PATTERN_FILED = Pattern.compile("^(private|public)((?!\\().)*(;)(.)*");
 
     //查询方法的正则表达式
     private static Pattern PATTERN_METHOD = Pattern.compile("^(private|public|protected)(.)*(\\()(.)*(\\))(\\s)*(\\{)(.)*");
+
+    public static Boolean isFieldDictionaryType(String classType){
+        return Arrays.asList(fieldDictionaryType).contains(classType);
+    }
 
     /**
      * 查询是否是基础类型

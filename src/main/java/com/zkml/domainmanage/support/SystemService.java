@@ -154,11 +154,13 @@ public class SystemService {
         for(DomainMetadata domainMetadata:domainList){
             if(!domainMetadata.isDirectory()){
                 for(FieldMetadata field:domainMetadata.getFieldMetadataList()){
+                    if(DomainUtils.isFieldDictionaryType(field.getFieldType())){
                         PropertiesMetadate propertiesMetadate = new PropertiesMetadate();
                         propertiesMetadate.setKey(field.getFieldName());
                         propertiesMetadate.setComment(field.getProcessedNote()+"("+field.getFieldType()+")");
                         propertiesMetadate.setValue("");
                         propertiesList.add(propertiesMetadate);
+                    }
                 }
             }
         }
