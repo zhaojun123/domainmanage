@@ -197,7 +197,8 @@ public class DomainManageService {
                 if(!updateFieldList.isEmpty())
                     domainMetadataHandle.update(updateFieldList,domainMetadata,FieldMetadata.Status.NONE);
 
-                //添加class上的ApiModel注解
+                //TODO 如果返回的是嵌套的VO 多个ApiModel标签会让swagger显示出bug
+                /*//添加class上的ApiModel注解
                 ClassMetadata classMetadata = domainMetadata.getClassMetadata();
                 List<BaseAnnotationMetadata> annotationList = classMetadata.getAnnotationList();
                 //检查是否有相同的注解，如果没有则添加
@@ -206,7 +207,7 @@ public class DomainManageService {
                     apiModelMetadata.setValue(classMetadata.getProcessedNote());
                     annotationList.add(apiModelMetadata);
                     domainMetadataHandle.update(classMetadata,domainMetadata);
-                }
+                }*/
             }
         }
     }
