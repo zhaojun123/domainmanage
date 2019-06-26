@@ -59,10 +59,16 @@ public class DomainDelegate {
         }
         for(lineIndex=0;lineIndex<contentList.size();lineIndex++){
             String contentLine = contentList.get(lineIndex).trim();
-            if(analysisPackage(contentLine))
+            if(analysisPackage(contentLine)){
+                oldNoteList.clear();
+                oldAnnotationList.clear();
                 continue;
-            if(analysisImport(contentLine))
+            }
+            if(analysisImport(contentLine)){
+                oldNoteList.clear();
+                oldAnnotationList.clear();
                 continue;
+            }
             if(analysisNote(contentLine))
                 continue;
             if(analysisAnnotation(contentLine))
@@ -73,6 +79,10 @@ public class DomainDelegate {
                 continue;
             if(analysisMethod(contentLine))
                 continue;
+            if(StringUtils.isNotBlank(contentLine)){
+                oldNoteList.clear();
+                oldAnnotationList.clear();
+            }
         }
         domainMetadata.setImportList(Collections.unmodifiableList(importList));
         domainMetadata.setFieldMetadataList(Collections.unmodifiableList(fieldList));
